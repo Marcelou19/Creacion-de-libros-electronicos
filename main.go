@@ -60,10 +60,10 @@ func main() {
 		case "5":
 			eliminarLibro(db)
 		case "6", "0":
-			fmt.Println("\n¡Hasta luego! 👋")
+			fmt.Println("\n¡Hasta luego!")
 			return
 		default:
-			fmt.Println("\n⚠️  Opción no válida. Intenta de nuevo.")
+			fmt.Println("\nOpción no válida. Intenta de nuevo.")
 		}
 	}
 }
@@ -73,9 +73,8 @@ func main() {
 // ---------------------------------------------------------------------------
 
 func mostrarMenu() {
-	fmt.Println("\n=======================================")
-	fmt.Println("   📚 GESTOR DE LIBROS ELECTRÓNICOS")
-	fmt.Println("=======================================")
+	fmt.Println("\nGestión de Libros electrónicos")
+	fmt.Println("---------------------------------------")
 	fmt.Println("  1) Agregar libro")
 	fmt.Println("  2) Listar todos los libros")
 	fmt.Println("  3) Buscar libro por ID")
@@ -106,11 +105,11 @@ func agregarLibro(db *sql.DB) {
 		titulo, autor, anio, isbn, categoria, precio, formato,
 	)
 	if err != nil {
-		fmt.Printf("❌ Error al agregar: %v\n", err)
+		fmt.Printf("Error al agregar: %v\n", err)
 		return
 	}
 	id, _ := res.LastInsertId()
-	fmt.Printf("✅ Libro agregado con ID %d.\n", id)
+	fmt.Printf("Libro agregado con ID %d.\n", id)
 }
 
 // listarLibros (READ): muestra todos los libros en una tabla.
@@ -119,7 +118,7 @@ func listarLibros(db *sql.DB) {
 		`SELECT id, titulo, autor, anio, isbn, categoria, precio, formato
 		 FROM libros ORDER BY id`)
 	if err != nil {
-		fmt.Printf("❌ Error al listar: %v\n", err)
+		fmt.Printf("Error al listar: %v\n", err)
 		return
 	}
 	defer rows.Close()
@@ -134,7 +133,7 @@ func listarLibros(db *sql.DB) {
 		var l Libro
 		if err := rows.Scan(&l.ID, &l.Titulo, &l.Autor, &l.Anio,
 			&l.ISBN, &l.Categoria, &l.Precio, &l.Formato); err != nil {
-			fmt.Printf("❌ Error al leer fila: %v\n", err)
+			fmt.Printf("Error al leer fila: %v\n", err)
 			return
 		}
 		fmt.Printf("%-4d | %-24s | %-20s | %-4d | %-13s | %-12s | %8.2f | %-6s\n",
@@ -153,14 +152,14 @@ func buscarLibro(db *sql.DB) {
 
 	l, err := obtenerLibro(db, int64(id))
 	if err == sql.ErrNoRows {
-		fmt.Printf("⚠️  No existe ningún libro con ID %d.\n", id)
+		fmt.Printf("No existe ningún libro con ID %d.\n", id)
 		return
 	}
 	if err != nil {
-		fmt.Printf("❌ Error al buscar: %v\n", err)
+		fmt.Printf("Error al buscar: %v\n", err)
 		return
 	}
-	fmt.Println("\n📖 Detalle del libro")
+	fmt.Println("\nDetalle del libro")
 	fmt.Printf("   ID:        %d\n", l.ID)
 	fmt.Printf("   Título:    %s\n", l.Titulo)
 	fmt.Printf("   Autor:     %s\n", l.Autor)
@@ -179,11 +178,11 @@ func actualizarLibro(db *sql.DB) {
 	// Primero verificamos que exista y mostramos sus datos actuales.
 	actual, err := obtenerLibro(db, int64(id))
 	if err == sql.ErrNoRows {
-		fmt.Printf("⚠️  No existe ningún libro con ID %d.\n", id)
+		fmt.Printf("No existe ningún libro con ID %d.\n", id)
 		return
 	}
 	if err != nil {
-		fmt.Printf("❌ Error: %v\n", err)
+		fmt.Printf("Error: %v\n", err)
 		return
 	}
 
@@ -204,7 +203,7 @@ func actualizarLibro(db *sql.DB) {
 		if n, err := strconv.Atoi(v); err == nil {
 			nuevo.Anio = n
 		} else {
-			fmt.Println("⚠️  Año inválido, se mantiene el actual.")
+			fmt.Println("Año inválido, se mantiene el actual.")
 		}
 	}
 	if v := leerTexto("Nuevo ISBN: "); v != "" {
@@ -217,7 +216,7 @@ func actualizarLibro(db *sql.DB) {
 		if p, err := strconv.ParseFloat(strings.Replace(v, ",", ".", 1), 64); err == nil {
 			nuevo.Precio = p
 		} else {
-			fmt.Println("⚠️  Precio inválido, se mantiene el actual.")
+			fmt.Println("Precio inválido, se mantiene el actual.")
 		}
 	}
 	if v := leerTexto("Nuevo formato (PDF/EPUB/MOBI): "); v != "" {
@@ -232,10 +231,10 @@ func actualizarLibro(db *sql.DB) {
 		nuevo.Categoria, nuevo.Precio, nuevo.Formato, id,
 	)
 	if err != nil {
-		fmt.Printf("❌ Error al actualizar: %v\n", err)
+		fmt.Printf("Error al actualizar: %v\n", err)
 		return
 	}
-	fmt.Println("✅ Libro actualizado correctamente.")
+	fmt.Println("Libro actualizado correctamente.")
 }
 
 // eliminarLibro (DELETE): borra un libro por su ID.
@@ -245,15 +244,15 @@ func eliminarLibro(db *sql.DB) {
 
 	res, err := db.Exec("DELETE FROM libros WHERE id = ?", id)
 	if err != nil {
-		fmt.Printf("❌ Error al eliminar: %v\n", err)
+		fmt.Printf("Error al eliminar: %v\n", err)
 		return
 	}
 	filas, _ := res.RowsAffected()
 	if filas == 0 {
-		fmt.Printf("⚠️  No existe ningún libro con ID %d.\n", id)
+		fmt.Printf("No existe ningún libro con ID %d.\n", id)
 		return
 	}
-	fmt.Printf("🗑️  Libro con ID %d eliminado.\n", id)
+	fmt.Printf("Libro con ID %d eliminado.\n", id)
 }
 
 // ---------------------------------------------------------------------------
@@ -302,7 +301,7 @@ func migrarTabla(db *sql.DB) error {
 		if _, err := db.Exec(sql); err != nil {
 			return fmt.Errorf("agregando columna %s: %w", col, err)
 		}
-		fmt.Printf("🔧 Columna '%s' agregada a la tabla.\n", col)
+		fmt.Printf("Columna '%s' agregada a la tabla.\n", col)
 	}
 	return nil
 }
@@ -361,7 +360,7 @@ func leerEntero(mensaje string) int {
 		texto := leerTexto(mensaje)
 		numero, err := strconv.Atoi(texto)
 		if err != nil {
-			fmt.Println("⚠️  Ingresa un número válido.")
+			fmt.Println("Ingresa un número válido.")
 			continue
 		}
 		return numero
@@ -376,7 +375,7 @@ func leerDecimal(mensaje string) float64 {
 		texto = strings.Replace(texto, ",", ".", 1)
 		numero, err := strconv.ParseFloat(texto, 64)
 		if err != nil {
-			fmt.Println("⚠️  Ingresa un precio válido (ej: 12.50).")
+			fmt.Println("Ingresa un precio válido (ej: 12.50).")
 			continue
 		}
 		return numero
