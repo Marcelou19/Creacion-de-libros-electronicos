@@ -1,0 +1,11 @@
+# Base de datos SQLite (se genera al correr el programa)
+libros.db
+*.db-journal
+*.db-wal
+
+# Binarios compilados de Go
+/Creacion-de-libros-electronicos
+*.exe
+
+# Capturas de pantalla / temporales
+*.png
