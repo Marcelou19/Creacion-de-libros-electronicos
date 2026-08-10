@@ -1,4 +1,4 @@
-module github.com/Marcelou19/Creacion-de-libros-electronicos
+module github.com/Marcelou19/Sistema-Gestion-Libros
 
 go 1.26.5
 
