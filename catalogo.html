@@ -1,0 +1,81 @@
+{{define "contenido"}}
+
+<form class="filtros" method="get" action="/">
+  <div class="campo">
+    <label for="q">Buscar por título o autor</label>
+    <span class="campo-icono">
+      <input type="search" id="q" name="q" value="{{.Busqueda}}"
+             placeholder="Escribe un título o un autor…" autocomplete="off">
+      <svg class="ico"><use href="#i-buscar"/></svg>
+    </span>
+  </div>
+  <button type="submit" class="btn btn-primario">
+    <svg class="ico"><use href="#i-buscar"/></svg> Buscar</button>
+  {{if .Busqueda}}
+  <a href="/" class="btn"><svg class="ico"><use href="#i-x"/></svg> Limpiar</a>
+  {{end}}
+  <a href="/libro/nuevo" class="btn"><svg class="ico"><use href="#i-mas"/></svg> Nuevo libro</a>
+  <span class="filtros-resumen">
+    {{.Total}} libro{{if ne .Total 1}}s{{end}} · valor {{dinero .Valor}}
+  </span>
+</form>
+
+<div class="tabla-std">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Título</th>
+        <th>Autor(es)</th>
+        <th class="num">Año</th>
+        <th>ISBN</th>
+        <th>Categoría</th>
+        <th class="num">Precio</th>
+        <th>Formato</th>
+        <th class="acciones">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{range .Libros}}
+      <tr>
+        <td class="celda-id">{{.ID}}</td>
+        <td class="desc strong"><a href="/libro/{{.ID}}">{{.Titulo}}</a></td>
+        <td class="desc">{{.Autores}}</td>
+        <td class="num">{{.Anio}}</td>
+        <td class="mono">{{.ISBN}}</td>
+        <td><span class="chip">{{.Categoria}}</span></td>
+        <td class="num strong">{{dinero .Precio}}</td>
+        <td>
+          {{if eq .Formato "—"}}<span class="chip chip-vacio">—</span>
+          {{else}}<span class="chip chip-primario">{{.Formato}}</span>{{end}}
+        </td>
+        <td class="acciones">
+          <a href="/libro/{{.ID}}/editar" class="btn btn-icono" title="Editar">
+            <svg class="ico"><use href="#i-lapiz"/></svg></a>
+          <form method="post" action="/libro/{{.ID}}/eliminar"
+                onsubmit="return confirm('¿Eliminar «{{.Titulo}}»?\n\nSe borrarán también sus vínculos con los autores (ON DELETE CASCADE). Queda registrado en la auditoría.');">
+            <button type="submit" class="accion-quitar" title="Eliminar">
+              <svg class="ico"><use href="#i-basura"/></svg></button>
+          </form>
+        </td>
+      </tr>
+    {{else}}
+      <tr><td colspan="9">
+        <div class="vacio">
+          <svg class="ico"><use href="#i-libro"/></svg>
+          {{if .Busqueda}}
+            <p>Sin coincidencias en títulos ni autores para «{{.Busqueda}}».</p>
+            <a href="/" class="btn">Ver todo el catálogo</a>
+          {{else}}
+            <p>El catálogo está vacío.</p>
+            <a href="/libro/nuevo" class="btn btn-primario">
+              <svg class="ico"><use href="#i-mas"/></svg> Agregar el primer libro</a>
+          {{end}}
+        </div>
+      </td></tr>
+    {{end}}
+    </tbody>
+  </table>
+</div>
+
+{{end}}

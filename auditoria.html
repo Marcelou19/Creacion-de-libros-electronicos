@@ -1,0 +1,57 @@
+{{define "contenido"}}
+
+<form class="filtros" method="get" action="/auditoria">
+  <div class="campo">
+    <label for="libro">Filtrar por ID de libro</label>
+    <span class="campo-icono">
+      <input type="text" id="libro" name="libro" value="{{.Filtro}}"
+             inputmode="numeric" placeholder="Vacío = todos" autocomplete="off">
+      <svg class="ico"><use href="#i-buscar"/></svg>
+    </span>
+  </div>
+  <button type="submit" class="btn btn-primario">Filtrar</button>
+  {{if .Filtro}}<a href="/auditoria" class="btn"><svg class="ico"><use href="#i-x"/></svg> Quitar filtro</a>{{end}}
+  <span class="filtros-resumen">
+    {{len .Filas}} movimiento{{if ne (len .Filas) 1}}s{{end}} · esta tabla la escriben los <em>triggers</em>, no la aplicación
+  </span>
+</form>
+
+<div class="tabla-std">
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th class="num">Libro</th>
+        <th>Operación</th>
+        <th>Campo</th>
+        <th>Antes</th>
+        <th>Después</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{range .Filas}}
+      <tr>
+        <td class="mono">{{.Fecha}}</td>
+        <td class="num"><a href="/libro/{{.LibroID}}">{{.LibroID}}</a></td>
+        <td>
+          {{if eq .Operacion "INSERT"}}<span class="chip chip-ok">INSERT</span>
+          {{else if eq .Operacion "DELETE"}}<span class="chip chip-error">DELETE</span>
+          {{else}}<span class="chip chip-warn">UPDATE</span>{{end}}
+        </td>
+        <td>{{.Campo}}</td>
+        <td class="desc">{{.Antes}}</td>
+        <td class="desc strong">{{.Despues}}</td>
+      </tr>
+    {{else}}
+      <tr><td colspan="6">
+        <div class="vacio">
+          <svg class="ico"><use href="#i-reloj"/></svg>
+          <p>Sin movimientos registrados.</p>
+        </div>
+      </td></tr>
+    {{end}}
+    </tbody>
+  </table>
+</div>
+
+{{end}}

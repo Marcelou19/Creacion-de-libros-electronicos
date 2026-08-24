@@ -1,0 +1,173 @@
+{{define "contenido"}}
+{{$r := .Resumen}}
+
+<!-- Resumen general: una sola consulta con COUNT/SUM/AVG/MIN/MAX. -->
+<div class="rejilla rejilla-kpi">
+  <div class="kpi">
+    <div class="kpi-etiqueta">Libros registrados</div>
+    <div class="kpi-valor">{{$r.Total}}</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-etiqueta">Autores distintos</div>
+    <div class="kpi-valor">{{$r.Autores}}</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-etiqueta">Categorías</div>
+    <div class="kpi-valor">{{$r.Categorias}}</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-etiqueta">Valor del catálogo</div>
+    <div class="kpi-valor">{{dinero $r.Suma}}</div>
+    <div class="kpi-nota">Promedio {{dinero $r.Promedio}}</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-etiqueta">Precio mín / máx</div>
+    <div class="kpi-valor" style="font-size:var(--fs-7)">{{dinero $r.Min}} — {{dinero $r.Max}}</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-etiqueta">Rango de años</div>
+    <div class="kpi-valor" style="font-size:var(--fs-7)">
+      {{if $r.Total}}{{$r.AnioMin}} — {{$r.AnioMax}}{{else}}—{{end}}
+    </div>
+  </div>
+</div>
+
+<div class="rejilla rejilla-2">
+
+  <!-- GROUP BY sobre un LEFT JOIN. -->
+  <section class="tarjeta">
+    <div class="tarjeta-cabecera">
+      <h2><svg class="ico"><use href="#i-etiqueta"/></svg> Libros por categoría</h2>
+    </div>
+    <div class="tarjeta-cuerpo sin-relleno">
+      <div class="tabla-std" style="border:none">
+        <table>
+          <thead><tr><th>Categoría</th><th class="num">Cant.</th><th class="num">Prom.</th><th class="num">Total</th></tr></thead>
+          <tbody>
+          {{range .Categorias}}
+            <tr>
+              <td class="desc strong">{{.Categoria}}</td>
+              <td class="num">{{.Cantidad}}</td>
+              <td class="num">{{dinero .Promedio}}</td>
+              <td class="num strong">{{dinero .Total}}</td>
+            </tr>
+          {{else}}
+            <tr><td colspan="4"><div class="vacio"><p>Sin datos.</p></div></td></tr>
+          {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN + GROUP BY + HAVING + ORDER BY + LIMIT.
+       HAVING filtra DESPUÉS de agrupar; WHERE filtraría antes, fila por fila. -->
+  <section class="tarjeta">
+    <div class="tarjeta-cabecera">
+      <h2><svg class="ico"><use href="#i-usuarios"/></svg> Autores más publicados</h2>
+      <div class="topbar-espacio"></div>
+      <form method="get" action="/reportes" style="display:flex;align-items:center;gap:5px">
+        <label for="min" class="campo-ayuda">HAVING ≥</label>
+        <input type="number" id="min" name="min" value="{{.Minimo}}" min="1"
+               style="width:64px;height:28px">
+        <button type="submit" class="btn" style="height:28px">Aplicar</button>
+      </form>
+    </div>
+    <div class="tarjeta-cuerpo sin-relleno">
+      <div class="tabla-std" style="border:none">
+        <table>
+          <thead><tr><th class="num">#</th><th>Autor</th><th class="num">Libros</th></tr></thead>
+          <tbody>
+          {{range $i, $a := .Autores}}
+            <tr>
+              <td class="celda-id num">{{mas1 $i}}</td>
+              <td class="desc strong">{{$a.Autor}}</td>
+              <td class="num"><span class="chip chip-primario">{{$a.Cantidad}}</span></td>
+            </tr>
+          {{else}}
+            <tr><td colspan="3"><div class="vacio"><p>Ningún autor llega a {{.Minimo}} libro(s).</p></div></td></tr>
+          {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tarjeta">
+    <div class="tarjeta-cabecera">
+      <h2><svg class="ico"><use href="#i-archivo"/></svg> Libros por formato</h2>
+    </div>
+    <div class="tarjeta-cuerpo sin-relleno">
+      <div class="tabla-std" style="border:none">
+        <table>
+          <thead><tr><th>Formato</th><th class="num">Cant.</th><th class="num">Prom.</th></tr></thead>
+          <tbody>
+          {{range .Formatos}}
+            <tr>
+              <td><span class="chip chip-primario">{{.Formato}}</span></td>
+              <td class="num">{{.Cantidad}}</td>
+              <td class="num strong">{{dinero .Promedio}}</td>
+            </tr>
+          {{else}}
+            <tr><td colspan="3"><div class="vacio"><p>Sin datos.</p></div></td></tr>
+          {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tarjeta">
+    <div class="tarjeta-cabecera">
+      <h2><svg class="ico"><use href="#i-dinero"/></svg> Los 5 libros más caros</h2>
+    </div>
+    <div class="tarjeta-cuerpo sin-relleno">
+      <div class="tabla-std" style="border:none">
+        <table>
+          <thead><tr><th>Título</th><th>Autor(es)</th><th class="num">Precio</th></tr></thead>
+          <tbody>
+          {{range .MasCaros}}
+            <tr>
+              <td class="desc strong">{{.Titulo}}</td>
+              <td class="desc">{{.Autores}}</td>
+              <td class="num strong">{{dinero .Precio}}</td>
+            </tr>
+          {{else}}
+            <tr><td colspan="3"><div class="vacio"><p>Sin datos.</p></div></td></tr>
+          {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- EXPLAIN QUERY PLAN: sirve para comprobar que los índices creados en la
+     migración se están usando de verdad. -->
+<section class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2><svg class="ico"><use href="#i-rayo"/></svg> Plan de ejecución (uso de índices)</h2>
+  </div>
+  <div class="tarjeta-cuerpo">
+    <div class="plan">
+    {{range .Planes}}
+      <div class="plan-item">
+        <div class="plan-titulo">
+          {{.Titulo}}
+          {{if .UsaIdx}}<span class="chip chip-ok">USA ÍNDICE</span>
+          {{else}}<span class="chip chip-warn">RECORRE LA TABLA</span>{{end}}
+        </div>
+        <div class="plan-sql">{{.SQL}}</div>
+        {{if .Error}}
+          <p class="campo-ayuda">Error: {{.Error}}</p>
+        {{else}}
+          <ul class="plan-pasos">{{range .Pasos}}<li>{{.}}</li>{{end}}</ul>
+        {{end}}
+      </div>
+    {{end}}
+    </div>
+  </div>
+</section>
+
+{{end}}

@@ -1,0 +1,69 @@
+{{define "contenido"}}
+{{$l := .Libro}}
+
+<div class="filtros">
+  <a href="/" class="btn"><svg class="ico"><use href="#i-atras"/></svg> Volver al catálogo</a>
+  <a href="/libro/{{$l.ID}}/editar" class="btn btn-primario">
+    <svg class="ico"><use href="#i-lapiz"/></svg> Editar</a>
+  <form method="post" action="/libro/{{$l.ID}}/eliminar"
+        onsubmit="return confirm('¿Eliminar «{{$l.Titulo}}»?\n\nQueda registrado en la auditoría.');">
+    <button type="submit" class="btn btn-eliminar--suave">
+      <svg class="ico"><use href="#i-basura"/></svg> Eliminar</button>
+  </form>
+  <span class="filtros-resumen">ID {{$l.ID}}</span>
+</div>
+
+<section class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2><svg class="ico"><use href="#i-libro"/></svg> Ficha del libro</h2>
+  </div>
+  <div class="tarjeta-cuerpo">
+    <dl class="ficha">
+      <div class="ficha-dato"><dt>Título</dt><dd>{{$l.Titulo}}</dd></div>
+      <div class="ficha-dato"><dt>Autor(es)</dt><dd>{{guion (unir $l.Autores)}}</dd></div>
+      <div class="ficha-dato"><dt>Año</dt><dd>{{$l.Anio}}</dd></div>
+      <div class="ficha-dato"><dt>ISBN</dt><dd class="mono">{{guion $l.ISBN}}</dd></div>
+      <div class="ficha-dato"><dt>Categoría</dt><dd>{{guion $l.Categoria}}</dd></div>
+      <div class="ficha-dato"><dt>Precio</dt><dd>{{dinero $l.Precio}}</dd></div>
+      <div class="ficha-dato"><dt>Formato</dt><dd>{{guion $l.Formato}}</dd></div>
+      <div class="ficha-dato"><dt>Registrado</dt><dd>{{$l.Creado}}</dd></div>
+      <div class="ficha-dato"><dt>Modificado</dt><dd>{{guion $l.Modificado}}</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2><svg class="ico"><use href="#i-reloj"/></svg> Últimos movimientos</h2>
+    <div class="topbar-espacio"></div>
+    <a href="/auditoria?libro={{$l.ID}}" class="btn">Ver historial completo</a>
+  </div>
+  <div class="tarjeta-cuerpo sin-relleno">
+    <div class="tabla-std" style="border:none">
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Operación</th><th>Campo</th><th>Antes</th><th>Después</th></tr>
+        </thead>
+        <tbody>
+        {{range .Movimiento}}
+          <tr>
+            <td class="mono">{{.Fecha}}</td>
+            <td>
+              {{if eq .Operacion "INSERT"}}<span class="chip chip-ok">INSERT</span>
+              {{else if eq .Operacion "DELETE"}}<span class="chip chip-error">DELETE</span>
+              {{else}}<span class="chip chip-warn">UPDATE</span>{{end}}
+            </td>
+            <td>{{.Campo}}</td>
+            <td class="desc">{{.Antes}}</td>
+            <td class="desc">{{.Despues}}</td>
+          </tr>
+        {{else}}
+          <tr><td colspan="5"><div class="vacio"><p>Sin movimientos registrados.</p></div></td></tr>
+        {{end}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{{end}}

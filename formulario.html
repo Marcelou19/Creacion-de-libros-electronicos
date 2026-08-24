@@ -1,0 +1,98 @@
+{{define "contenido"}}
+{{$l := .Libro}}
+
+<form method="post" action="{{.Accion}}" class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2>
+      <svg class="ico"><use href="{{if .Editando}}#i-lapiz{{else}}#i-mas{{end}}"/></svg>
+      {{if .Editando}}Editar libro #{{$l.ID}}{{else}}Datos del nuevo libro{{end}}
+    </h2>
+  </div>
+
+  <div class="tarjeta-cuerpo">
+    <div class="form-rejilla">
+
+      <div class="campo form-ancho">
+        <label for="titulo">Título *</label>
+        <input type="text" id="titulo" name="titulo" value="{{$l.Titulo}}" required
+               maxlength="200" placeholder="El nombre del viento">
+      </div>
+
+      <div class="campo form-ancho">
+        <label for="autores">Autor(es)</label>
+        <input type="text" id="autores" name="autores" value="{{.AutoresTxt}}"
+               list="lista-autores" placeholder="Patrick Rothfuss, Neil Gaiman"
+               autocomplete="off">
+        <span class="campo-ayuda">
+          Separados por coma. Un libro puede tener varios (relación N:M); los
+          repetidos se omiten.
+        </span>
+        <datalist id="lista-autores">
+          {{range .Autores}}<option value="{{.}}"></option>{{end}}
+        </datalist>
+      </div>
+
+      <div class="campo">
+        <label for="anio">Año *</label>
+        <input type="number" id="anio" name="anio" value="{{$l.Anio}}"
+               min="1450" max="2100" required>
+        <span class="campo-ayuda">Entre 1450 y 2100 (CHECK de la tabla).</span>
+      </div>
+
+      <div class="campo">
+        <label for="precio">Precio</label>
+        <input type="number" id="precio" name="precio" value="{{printf "%.2f" $l.Precio}}"
+               min="0" step="0.01">
+        <span class="campo-ayuda">Mayor o igual a cero.</span>
+      </div>
+
+      <div class="campo">
+        <label for="isbn">ISBN</label>
+        <input type="text" id="isbn" name="isbn" value="{{$l.ISBN}}"
+               placeholder="978-84-…" autocomplete="off">
+        <span class="campo-ayuda">Único. Déjalo vacío si no tiene (se guarda NULL).</span>
+      </div>
+
+      <div class="campo">
+        <label for="categoria">Categoría</label>
+        <input type="text" id="categoria" name="categoria" value="{{$l.Categoria}}"
+               list="lista-categorias" placeholder="Fantasía" autocomplete="off">
+        <span class="campo-ayuda">Si no existe, se crea sola.</span>
+        <datalist id="lista-categorias">
+          {{range .Categorias}}<option value="{{.}}"></option>{{end}}
+        </datalist>
+      </div>
+
+      <div class="campo">
+        <label for="formato">Formato</label>
+        <span class="campo-icono">
+          <select id="formato" name="formato">
+            <option value="">(sin formato)</option>
+            {{range $.Formatos}}
+              <option value="{{.}}" {{if eq . $l.Formato}}selected{{end}}>{{.}}</option>
+            {{end}}
+          </select>
+          <svg class="ico"><use href="#i-etiqueta"/></svg>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="form-pie">
+    <button type="submit" class="btn btn-primario">
+      <svg class="ico"><use href="#i-guardar"/></svg>
+      {{if .Editando}}Guardar cambios{{else}}Agregar libro{{end}}
+    </button>
+    <a href="{{if .Editando}}/libro/{{$l.ID}}{{else}}/{{end}}" class="btn">Cancelar</a>
+    <span class="separador"></span>
+    {{if .Editando}}
+    <span class="campo-ayuda">
+      La lista de autores se reemplaza entera al guardar. Los cambios quedan en
+      la auditoría campo por campo.
+    </span>
+    {{end}}
+  </div>
+</form>
+
+{{end}}
