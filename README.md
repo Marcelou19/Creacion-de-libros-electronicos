@@ -7,26 +7,6 @@ Además del CRUD implementa un modelo relacional normalizado con restricciones
 de integridad, claves foráneas, índices, una vista, disparadores de auditoría,
 transacciones y migraciones versionadas.
 
-## Requisitos
-
-- Go 1.26.5 o superior.
-- Dependencia: `modernc.org/sqlite` v1.54.0.
-
-No hace falta instalar SQLite ni un compilador de C: el driver es SQLite
-traducido a Go puro. El archivo `libros.db` que genera es SQLite estándar y se
-abre con DBeaver, DB Browser o el CLI `sqlite3`.
-
-## Ejecución
-
-```bash
-git clone https://github.com/Marcelou19/Sistema-Gestion-Libros.git
-cd Sistema-Gestion-Libros
-
-go run .                        # menú de consola
-go run . -web                   # interfaz web en http://localhost:8090
-go run . -web :9000             # otro puerto
-```
-
 O compilando un binario:
 
 ```bash
